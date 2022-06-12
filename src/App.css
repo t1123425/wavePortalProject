@@ -1,0 +1,12 @@
+.dataContainer{
+  display:inline-block;
+  max-width:1024px;
+  margin:auto;
+}
+.waveButton {
+  cursor: pointer;
+  margin-top: 16px;
+  padding: 8px;
+  border: 0;
+  border-radius: 5px;
+}
