@@ -15,6 +15,7 @@ export default function App() {
 
 
   const changeBg = () => {
+    //console.log('bgStatus',bgStatus);
      switch (bgStatus) {
         case 'mining':
           return 'frog2'
@@ -45,7 +46,6 @@ export default function App() {
   }
   const checkWalletConnect = async () => {
     try{
-      setBgStatus('init');
       if(!ethereum){
         //console.log('make sure you have MetaMask!');
         setErrorMsg("Make sure you have MetaMask!");
@@ -62,6 +62,7 @@ export default function App() {
          const account = accounts[0];
          console.log("Found an authorized account:", account);
          setCurrentAccount(account);
+         setBgStatus('init');
         //  await refreshWaveCount();
        }else{
           setBgStatus('error');
@@ -92,8 +93,10 @@ export default function App() {
         setBgStatus('error');
         return;
       }
+
       const accounts = await ethereum.request({ method: "eth_requestAccounts" });
       //console.log("Connected", accounts[0]);
+      setBgStatus('init');
       setCurrentAccount(accounts[0]);
       // await checkWaveCount(ethereum);
     }catch (error){
