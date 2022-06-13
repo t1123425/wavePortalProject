@@ -2,18 +2,56 @@ import React,{useEffect,useState} from "react";
 import { ethers } from "ethers";
 import abi from "./utils/WavePortal.json";
 import ButtonGroup from "./component/buttonGroup";
+import MessageList from "./component/messageList";
 export default function App() {
   const contractABI = abi.abi;
   const { ethereum } = window;
   let provider = null;
   let signer = null;
   let wavePortalContract = null;
+  const [allWaves, setAllWaves] = useState([]);
   const [currentAccount,setCurrentAccount] = useState("");
   const [waveCount,setWaveCount] = useState(0);
   const [bgStatus,setBgStatus] = useState('init');
   const [errorMsg,setErrorMsg] = useState("");
 
 
+  /*
+   * Create a method that gets all waves from your contract
+   */
+  const getAllWaves = async () => {
+    try{
+      if(ethereum){
+        await checkEtherProvider();
+        const waves = await wavePortalContract.getAllWaves();
+        /*
+         * We only need address, timestamp, and message in our UI so let's
+         * pick those out
+         */
+        let wavesCleaned = [];
+        waves.forEach(wave => {
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp * 1000),
+            message: wave.message
+          });
+        });
+
+        /*
+         * Store our data in React State
+         */
+        setAllWaves(wavesCleaned);
+      }else{
+        console.log("Ethereum object doesn't exist!")
+      }
+      /*
+         * Call the getAllWaves method from your Smart Contract
+         */
+
+    }catch(error){
+      console.error(error);
+    }
+  }
   const changeBg = () => {
     //console.log('bgStatus',bgStatus);
      switch (bgStatus) {
@@ -27,6 +65,7 @@ export default function App() {
           return 'frog1'
      }
   }
+
   const changeMsg = () => {
       if(bgStatus === 'finish'){
         return <>
@@ -44,6 +83,7 @@ export default function App() {
         </>
       }
   }
+  //checkWalletConnect
   const checkWalletConnect = async () => {
     try{
       if(!ethereum){
@@ -63,6 +103,7 @@ export default function App() {
          console.log("Found an authorized account:", account);
          setCurrentAccount(account);
          setBgStatus('init');
+         await getAllWaves();
         //  await refreshWaveCount();
        }else{
           setBgStatus('error');
@@ -82,7 +123,6 @@ export default function App() {
   }
   const refreshWaveCount = async () => {
     const count = await wavePortalContract.getTotalWaves();
-    // console.log('count:',count);
     setWaveCount(count.toNumber())
   }
 
@@ -105,24 +145,24 @@ export default function App() {
     }
   }
   
-  const wave = async () => {
+  const wave = async (message) => {
     try{
       const {ethereum} = window;
       if(ethereum){
+        console.log('message',message);
         await checkEtherProvider();
         /*
         * Execute the actual wave from your smart contract
         */
-        const waveTxn = await wavePortalContract.wave();
+        const waveTxn = await wavePortalContract.wave(message);
         setBgStatus('mining');
         console.log("Mining...", waveTxn.hash);
         await waveTxn.wait();
         console.log("Mined -- ", waveTxn.hash);
         await refreshWaveCount();
-        // count = await wavePortalContract.getTotalWaves();
-        // setWaveCount(count.toNumber());
         setBgStatus('finish');
-        console.log("Retrieved total wave count...",waveCount);
+        await getAllWaves();
+        //console.log("Retrieved total wave count...",waveCount);
       }else{
         console.log("Ethereum object doesn't exist!");
         setBgStatus('error');
@@ -175,6 +215,11 @@ export default function App() {
           }
         </div>
         <ButtonGroup status={checkButtonStatus()} wave={wave} connectWallet={connectWallet} ></ButtonGroup>
+        {
+          allWaves.lenght !== 0 && (
+            <MessageList allWaves={allWaves}></MessageList>
+          )
+        }
       </div>
     </div>
   );

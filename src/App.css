@@ -25,6 +25,9 @@
   max-width:100px;
   width:100%;
 }
+.msgBox{
+   min-height: 150px;
+}
 .frog1{
   background-image: url('../src/asset/img/pepefrog.jpg');
 }
@@ -36,4 +39,8 @@
 }
 .frog3{
   background-image: url('../src/asset/img/pepeFrog_finish.png');
+}
+
+.frog4{
+  background-image: url('../src/asset/img/pepefrog3.jpg');
 }
