@@ -1,5 +1,5 @@
 import React from "react";
-
+import loading from '../../asset/img/loading.gif';
 const ButtonGroup = props => {
 
     const buttonChange = () => {
@@ -9,7 +9,7 @@ const ButtonGroup = props => {
                 Wave at Me
               </button>
             case 'loading':
-                return <p>Loading...</p>
+                return  <img src={loading} className="inline"  alt="lOADING"/>
             case 'unconnected':
                 return <button  className="waveButton bg-sky-600 w-full text-white" onClick={props.connectWallet}>
                 Connect wallet

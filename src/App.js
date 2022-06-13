@@ -11,6 +11,7 @@ export default function App() {
   const [currentAccount,setCurrentAccount] = useState("");
   const [waveCount,setWaveCount] = useState(0);
   const [bgStatus,setBgStatus] = useState('init');
+  const [errorMsg,setErrorMsg] = useState("");
 
 
   const changeBg = () => {
@@ -27,9 +28,14 @@ export default function App() {
   }
   const changeMsg = () => {
       if(bgStatus === 'finish'){
-        return <h3>Done !! Thank you</h3>
+        return <>
+            <h2 className="font-black text-orange-400 text-lg">Thank for your wave.</h2>
+            <h2 className="font-black text-orange-400 text-lg">HAVE A NICE DAY !!</h2>
+            <p className="mt-5">the Total Wave Count :</p>
+            <h2 className="text-white text-lg">{waveCount}</h2>
+          </>
       }else if(bgStatus === 'mining'){
-         return <p> Mining... Plesae wait a mins</p>
+         return <p className="font-bold text-lime-400"> Mining... Plesae wait a mins</p>
       }else{
         return <>
            <p>My name is Tom , Nice to meet you guys.</p>
@@ -41,7 +47,8 @@ export default function App() {
     try{
       setBgStatus('init');
       if(!ethereum){
-        console.log('make sure you have MetaMask!');
+        //console.log('make sure you have MetaMask!');
+        setErrorMsg("Make sure you have MetaMask!");
         setBgStatus('error');
         return;
       }else{
@@ -55,10 +62,10 @@ export default function App() {
          const account = accounts[0];
          console.log("Found an authorized account:", account);
          setCurrentAccount(account);
-         await checkEtherProvider();
-         await refreshWaveCount();
+        //  await refreshWaveCount();
        }else{
           setBgStatus('error');
+          setErrorMsg("Please Connect the wallet");
           console.log("No authorized account found")
        }
 
@@ -74,7 +81,7 @@ export default function App() {
   }
   const refreshWaveCount = async () => {
     const count = await wavePortalContract.getTotalWaves();
-    console.log('count:',count);
+    // console.log('count:',count);
     setWaveCount(count.toNumber())
   }
 
@@ -91,7 +98,7 @@ export default function App() {
       // await checkWaveCount(ethereum);
     }catch (error){
       setBgStatus('error');
-      console.log(error);
+      console.error(error);
     }
   }
   
@@ -99,11 +106,7 @@ export default function App() {
     try{
       const {ethereum} = window;
       if(ethereum){
-        // const provider = new ethers.providers.Web3Provider(ethereum);
-        // const signer = provider.getSigner();
-        // const wavePortalContract = new ethers.Contract(process.env.REACT_APP_WAVEPORTAL_ADDRESS, contractABI, signer);
-        // let count = await wavePortalContract.getTotalWaves();
-        // console.log("Retrieved total wave count...", count.toNumber());
+        await checkEtherProvider();
         /*
         * Execute the actual wave from your smart contract
         */
@@ -123,19 +126,18 @@ export default function App() {
       }
     }catch(err){
       setBgStatus('error');
-      console.log(err);
+      console.error(err);
     }
   }
   const checkButtonStatus = () => {
      if(currentAccount){
-        if(bgStatus === 'init' || bgStatus === 'finish'){
-          return 'connected';
-        }else if(bgStatus === 'mining'){
+        if(bgStatus === 'mining'){
           return 'loading';
+        }else{
+          return 'connected';
         }
-        return 'unconnected';
      }else{
-       return null;
+      return 'unconnected';
      }
   }
   /*
@@ -159,14 +161,16 @@ export default function App() {
             changeMsg()
           }
         </div>
-        {
-          currentAccount && bgStatus !== 'error'? (
-            <div className="waveCountBox mt-5 text-center">
-              <p>the Current Wave Count :</p>
-              <h2 className="text-white">{waveCount}</h2>
-          </div>
-          ):<p className="text-red-600"> oops~ something wrong</p>
-        }
+        <div className="mt-5 text-center">
+          {
+            bgStatus === 'error' && (
+              <>
+               <p className="text-red-600"> oops~ something wrong</p>
+               <p className="text-red-600">{errorMsg}</p>
+              </>
+            )
+          }
+        </div>
         <ButtonGroup status={checkButtonStatus()} wave={wave} connectWallet={connectWallet} ></ButtonGroup>
       </div>
     </div>

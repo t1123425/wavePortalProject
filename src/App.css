@@ -3,10 +3,7 @@
   max-width:1024px;
   margin:auto;
 }
-.waveCountBox h2{
-  font-size: large;
-  font-weight: bold;
-}
+
 .waveButton {
   cursor: pointer;
   margin-top: 16px;
@@ -23,6 +20,10 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+.btnGroup img{
+  max-width:100px;
+  width:100%;
 }
 .frog1{
   background-image: url('../src/asset/img/pepefrog.jpg');
