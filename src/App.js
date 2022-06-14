@@ -28,13 +28,12 @@ export default function App() {
          * We only need address, timestamp, and message in our UI so let's
          * pick those out
          */
-        let wavesCleaned = [];
-        waves.forEach(wave => {
-          wavesCleaned.push({
+        const wavesCleaned = waves.map(wave => {
+          return {
             address: wave.waver,
             timestamp: new Date(wave.timestamp * 1000),
-            message: wave.message
-          });
+            message: wave.message,
+          };
         });
 
         /*
@@ -216,7 +215,7 @@ export default function App() {
         </div>
         <ButtonGroup status={checkButtonStatus()} wave={wave} connectWallet={connectWallet} ></ButtonGroup>
         {
-          allWaves.lenght !== 0 && (
+          allWaves.length > 0 && (
             <MessageList allWaves={allWaves}></MessageList>
           )
         }
